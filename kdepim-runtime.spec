@@ -3,7 +3,7 @@
 Name: kdepim-runtime
 Summary: KDE PIM Runtime Environment
 Version: 4.3.4
-Release: 4%{?dist}.0.sl6
+Release: 5%{?dist}
 
 License: GPLv2
 Group: Applications/Productivity
@@ -12,12 +12,14 @@ Source0: ftp://ftp.kde.org/pub/kde/stable/%{version}/src/%{name}-%{version}.tar.
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
+# bz#660581, fastrack, kdepim-runtime can't be build on rhel-6.0
+Patch1: kdepim-runtime-4.3.4-bz#660581.patch
+
+# bz#625121, fastrack, don't show Akonaditray icon
+Patch2: kdepim-runtime-4.3.4-bz#625121.patch
+
 # 4.3 branch fixes
 Patch100: kdepim-runtime-4.3.5.patch
-
-# fix build issue without webkit 
-Patch200: kdepim-runtime-4.3.4-nowebkit.patch
-
 
 Requires: %{name}-libs = %{version}-%{release}
 
@@ -58,10 +60,11 @@ Install %{name}-devel if you want to write or compile %{name} plugins.
 %prep
 %setup -q
 
+%patch1 -p1 -b .bz#660581
+%patch2 -p1 -b .bz#625121
+
 # 4.3 branch
 %patch100 -p1 -b .kde435
-# fix build issue without webkit 
-%patch200 -p1 -b .nowebkit
 
 %build
 mkdir -p %{_target_platform}
@@ -142,8 +145,9 @@ rm -rf %{buildroot}
 
 
 %changelog
-* Wed Dec 22 2010 Troy Dawson <dawson@fnal.gov> - 4.3.4-4.0.sl6
-- Added patch required to build with the webkit (bz#660581)
+* Mon Jul 18 2011 Than Ngo <than@redhat.com> - 4.3.4-5
+- Resolves: bz#625121, don't show akonaditray icon
+- Resolves: bz#660581, build failfure
 
 * Wed Mar 31 2010 Than Ngo <than@redhat.com> - 4.3.4-4
 - rebuilt against qt 4.6.2
